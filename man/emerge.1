@@ -888,19 +888,33 @@ necessary.
 Set the \fBROOT\fR environment variable.
 .TP
 .BR \-\-root\-deps[=rdeps]
-If no argument is given then build\-time dependencies of packages for
-\fBROOT\fR are installed to \fBROOT\fR instead of /.
+If no argument is given then build\-time dependencies specified in
+\fBDEPEND\fR of packages for \fBROOT\fR are installed to \fBROOT\fR
+rather than /.
 If the \fBrdeps\fR argument is given then discard all build\-time dependencies
 of packages for \fBROOT\fR.
 This option is only meaningful when used together with \fBROOT\fR and it should
 not be enabled under normal circumstances!
 
-Does not affect EAPIs that support \fBHDEPEND\fR.
-Experimental \fBEAPI 5-hdepend\fR provides \fBHDEPEND\fR as a new
-means to adjust installation into "\fI/\fR" and \fBROOT\fR.
-If ebuilds using EAPIs which \fIdo not\fR support \fBHDEPEND\fR are built in
-the same \fBemerge\fR run as those using EAPIs which \fIdo\fR support
-\fBHDEPEND\fR, this option affects only the former.
+For \fBEAPI 5-hdepend\fR, this option has no effect. \fBHDEPEND\fR
+specifies build\-time dependencies that go into / while \fBDEPEND\fR
+specifies build\-time dependencies that go into \fBROOT\fR.
+
+For \fBEAPI 7\fR and later, the \fBrdeps\fR argument has no effect and
+is the same as \fB--root-deps\fR alone. \fBBDEPEND\fR specifies
+build\-time dependencies that always go into /. The option otherwise
+acts on \fBDEPEND\fR as described above.
+
+When ebuilds with different EAPIs feature in the same emerge run, the
+appropriate behaviour for each EAPI is applied independently to each
+ebuild.
+
+Giving \fB--root-deps=rdeps\fR is recommended when cross\-compiling
+and crossdev's cross-emerge wrapper will do this for you by
+default. Note that using \fB--root-deps\fR will not do everything
+required to build against headers and libraries in \fBROOT\fR rather
+than /. The toolchain must be configured with the appropriate sysroot
+or wrappers must be used to enforce this.
 .TP
 .BR "\-\-search\-index < y | n >"
 Enable or disable indexed search for search actions. This option is
