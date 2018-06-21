@@ -309,10 +309,9 @@ class LocationsManager(object):
 		self.target_root = normalize_path(os.path.abspath(
 			self.target_root)).rstrip(os.path.sep) + os.path.sep
 
-		if self.sysroot != "/" and self.sysroot != self.target_root:
+		if self.sysroot != "/" and self.target_root == "/":
 			writemsg(_("!!! Error: SYSROOT (currently %s) must "
-				"equal / or ROOT (currently %s).\n") %
-				(self.sysroot, self.target_root),
+				"be set to / when ROOT is /.\n") % self.sysroot,
 				noiselevel=-1)
 			raise InvalidLocation(self.sysroot)
 
