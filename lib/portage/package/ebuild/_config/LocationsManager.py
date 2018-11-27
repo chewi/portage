@@ -71,8 +71,6 @@ class LocationsManager(object):
 		else:
 			self.sysroot = normalize_path(os.path.abspath(self.sysroot or os.sep)).rstrip(os.sep) + os.sep
 
-		self.esysroot = self.sysroot.rstrip(os.sep) + self.eprefix + os.sep
-
 		# TODO: Set this via the constructor using
 		# PORTAGE_OVERRIDE_EPREFIX.
 		self.broot = portage.const.EPREFIX
@@ -319,6 +317,16 @@ class LocationsManager(object):
 		self._check_var_directory("ROOT", self.target_root)
 
 		self.eroot = self.target_root.rstrip(os.sep) + self.eprefix + os.sep
+
+		# In a cross-prefix scenario where SYSROOT=/ and
+		# ROOT=/, assume we want ESYSROOT to point to the
+		# target prefix.
+		if self.sysroot == self.target_root:
+			self.esysroot = self.sysroot.rstrip(os.sep) + self.eprefix + os.sep
+		elif self.sysroot == "/":
+			self.esysroot = self.broot + os.sep
+		else:
+			self.esysroot = self.sysroot
 
 		self.global_config_path = GLOBAL_CONFIG_PATH
 		if portage.const.EPREFIX:
