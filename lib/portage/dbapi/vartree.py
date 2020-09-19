@@ -5175,23 +5175,32 @@ class dblink:
 				# whether config protection or not, we merge the new file the
 				# same way.  Unless moveme=0 (blocking directory)
 				if moveme:
-					# Create hardlinks only for source files that already exist
-					# as hardlinks (having identical st_dev and st_ino).
-					hardlink_key = (mystat.st_dev, mystat.st_ino)
+					mymtime = None
 
-					hardlink_candidates = self._hardlink_merge_map.get(hardlink_key)
-					if hardlink_candidates is None:
-						hardlink_candidates = []
-						self._hardlink_merge_map[hardlink_key] = hardlink_candidates
+					if mydstat and self._installed_instance:
+						exobj = self._installed_instance.getcontents()[myrealdest]
+						if exobj == ("obj", str(mydstat.st_mtime_ns // 1000000000), mymd5):
+							mymtime = mydstat.st_mtime_ns
+							zing = "==="
 
-					mymtime = movefile(mysrc, mydest, newmtime=thismtime,
-						sstat=mystat, mysettings=self.settings,
-						hardlink_candidates=hardlink_candidates,
-						encoding=_encodings['merge'])
 					if mymtime is None:
-						return 1
-					hardlink_candidates.append(mydest)
-					zing = ">>>"
+						# Create hardlinks only for source files that already exist
+						# as hardlinks (having identical st_dev and st_ino).
+						hardlink_key = (mystat.st_dev, mystat.st_ino)
+
+						hardlink_candidates = self._hardlink_merge_map.get(hardlink_key)
+						if hardlink_candidates is None:
+							hardlink_candidates = []
+							self._hardlink_merge_map[hardlink_key] = hardlink_candidates
+
+						mymtime = movefile(mysrc, mydest, newmtime=thismtime,
+							sstat=mystat, mysettings=self.settings,
+							hardlink_candidates=hardlink_candidates,
+							encoding=_encodings['merge'])
+						if mymtime is None:
+							return 1
+						hardlink_candidates.append(mydest)
+						zing = ">>>"
 
 					try:
 						self._merged_path(mydest, os.lstat(mydest))
